@@ -227,6 +227,54 @@
       border-bottom: 1px solid #edf0f3;
     }
 
+
+/* 訂單摘要：商品與刪除按鈕 */
+
+.summary-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.summary-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.summary-right strong {
+  white-space: nowrap;
+}
+
+/* 垃圾桶按鈕 */
+
+.remove-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #8b97a6;
+  transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+  background: #fff0f0;
+  border-color: #f1d0d0;
+  color: #c0392b;
+}
+
+.remove-button:focus-visible {
+  outline: 2px solid #245783;
+  outline-offset: 2px;
+}
+
+
     .total {
       display: flex;
       justify-content: space-between;
@@ -627,33 +675,85 @@ function loadProductsJSONP() {
     );
   }
 
-  function renderSummary() {
-    const items = selectedProducts();
-    const target = $("summaryItems");
-    target.replaceChildren();
 
-    if (items.length === 0) {
-      target.append(
-        createText("p", "muted", "尚未選擇商品")
-      );
-    } else {
-      items.forEach(p => {
-        const line = createText("div", "summary-line", "");
-        line.append(
-          createText("span", "", `${p.name} × ${cart[p.id]}`),
-          createText("strong", "", money(p.price * cart[p.id]))
-        );
-        target.append(line);
-      });
-    }
+function renderSummary() {
+  const items = selectedProducts();
+  const target = $("summaryItems");
+  target.replaceChildren();
 
-    const total = items.reduce(
-      (sum, p) => sum + p.price * cart[p.id], 0
+  if (items.length === 0) {
+    target.append(
+      createText("p", "muted", "尚未選擇商品")
     );
+  } else {
+    items.forEach(p => {
+      const line = createText("div", "summary-line", "");
 
-    $("totalPrice").textContent = money(total);
-    $("submitButton").disabled = items.length === 0;
+      const name = createText(
+        "span",
+        "summary-name",
+        `${p.name} × ${cart[p.id]}`
+      );
+
+      const right = createText("div", "summary-right", "");
+
+      const price = createText(
+        "strong",
+        "",
+        money(p.price * cart[p.id])
+      );
+
+      // 刪除商品按鈕
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove-button";
+      removeButton.title = "移除商品";
+      removeButton.setAttribute(
+        "aria-label",
+        `移除 ${p.name}`
+      );
+
+      // 垃圾桶 SVG 圖示
+      removeButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="17" height="17"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.8"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M3 6h18"/>
+          <path d="M8 6V4h8v2"/>
+          <path d="M19 6l-1 14H6L5 6"/>
+          <path d="M10 10v6"/>
+          <path d="M14 10v6"/>
+        </svg>
+      `;
+
+      removeButton.addEventListener("click", () => {
+        cart[p.id] = 0;
+
+        renderProducts();
+        renderSummary();
+      });
+
+      right.append(price, removeButton);
+      line.append(name, right);
+      target.append(line);
+    });
   }
+
+  const total = items.reduce(
+    (sum, p) => sum + p.price * cart[p.id],
+    0
+  );
+
+  $("totalPrice").textContent = money(total);
+  $("submitButton").disabled = items.length === 0;
+}
+
 
   function changeType(type) {
     currentType = type;
