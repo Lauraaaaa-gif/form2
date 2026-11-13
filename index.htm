@@ -1224,8 +1224,8 @@ function getDaysUntilRelease(product) {
     (toUTC(product.startDate) - toUTC(today)) / 86400000
   );
 
-  // 只顯示 1～30 天內的上架倒數
-  if (days < 1 || days > 30) {
+  // 只顯示 1～60 天內的上架倒數
+  if (days < 1 || days > 60) {
     return null;
   }
 
