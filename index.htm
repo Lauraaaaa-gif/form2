@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10243d">
+  <title>Bai Xi 代儲代送｜線上訂購</title>
+  <style>
+    :root {
+      --navy: #10243d;
+      --blue: #245783;
+      --bg: #f5f7fa;
+      --white: #ffffff;
+      --line: #dfe5ec;
+      --muted: #66758a;
+      --text: #1b2a3c;
+      --green: #13785d;
+      --red: #af3345;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    button { cursor: pointer; }
+
+    .header {
+      background: var(--navy);
+      color: white;
+      padding: 19px max(20px, calc((100vw - 1120px) / 2));
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 750;
+      letter-spacing: .4px;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 400;
+      color: #c3ceda;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 36px auto;
+      padding: 0 20px;
+    }
+
+    .intro { margin-bottom: 24px; }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(24px, 4vw, 32px);
+      color: var(--navy);
+    }
+
+    .intro p, .muted { color: var(--muted); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 15px rgba(19, 39, 61, .035);
+    }
+
+    .card h2 {
+      margin: 0 0 17px;
+      font-size: 19px;
+      color: var(--navy);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 13px;
+      background: #f4f6f9;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+
+    .tab.active {
+      background: var(--navy);
+      color: white;
+      border-color: var(--navy);
+    }
+
+    .product {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .product:last-child { border-bottom: 0; }
+
+    .product-info { min-width: 0; }
+
+    .product-name { font-weight: 650; }
+
+    .price {
+      color: var(--blue);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: #e5f0fc;
+      color: #245783;
+      margin-top: 6px;
+    }
+
+    .quantity {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      flex-shrink: 0;
+    }
+
+    .quantity button {
+      width: 32px;
+      height: 32px;
+      background: white;
+      border: 1px solid #c9d4e0;
+      border-radius: 7px;
+      color: var(--navy);
+      font-weight: bold;
+    }
+
+    .quantity span {
+      display: inline-block;
+      min-width: 20px;
+      text-align: center;
+      font-weight: 650;
+    }
+
+    .field { margin-bottom: 17px; }
+
+    label {
+      display: block;
+      font-weight: 650;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .required { color: var(--red); }
+
+    input[type="text"], textarea {
+      display: block;
+      width: 100%;
+      border: 1px solid #cbd5df;
+      border-radius: 8px;
+      padding: 12px 13px;
+      background: white;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px #24578318;
+    }
+
+    textarea { resize: vertical; }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+
+    .remember input { margin-top: 5px; }
+
+    .summary {
+      position: sticky;
+      top: 20px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-top: 1px solid var(--line);
+      margin-top: 15px;
+    }
+
+    .total strong {
+      font-size: 25px;
+      color: var(--navy);
+    }
+
+    .primary {
+      width: 100%;
+      background: var(--navy);
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 13px;
+      font-weight: 700;
+    }
+
+    .primary:hover { background: #1b3b5d; }
+
+    .primary:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .notice {
+      background: #f0f5fa;
+      color: #475e78;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-top: 15px;
+    }
+
+    .message {
+      font-size: 13px;
+      margin: 12px 0;
+      color: var(--green);
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 20px 0 35px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 20, 35, .65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      z-index: 10;
+    }
+
+    .overlay[hidden] { display: none; }
+
+    .modal {
+      background: white;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 13px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    .modal h2 { margin-top: 0; }
+
+    .modal textarea {
+      min-height: 260px;
+      margin: 15px 0;
+      font-size: 13px;
+    }
+
+    .secondary {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      width: 100%;
+      margin-top: 9px;
+    }
+
+    @media (max-width: 780px) {
+      .container { margin: 24px auto; }
+      .layout { grid-template-columns: 1fr; }
+      .card { padding: 19px; }
+      .summary { position: static; }
+    }
+
+    @media (max-width: 380px) {
+      .product { gap: 8px; }
+      .quantity { gap: 6px; }
+      .quantity button { width: 29px; height: 29px; }
+      .product-name { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    Bai Xi 代儲代送
+    <small>BAI XI · ORDER SERVICE</small>
+  </div>
+</header>
+
+<main class="container">
+  <div class="intro">
+    <h1>線上訂購服務</h1>
+    <p>選擇所需商品並填寫遊戲資料，系統將自動計算訂單金額。</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <section class="card">
+        <h2>01｜選擇服務與商品</h2>
+
+        <div class="tabs">
+          <button type="button" class="tab active" data-type="topup">
+            代儲服務
+          </button>
+          <button type="button" class="tab" data-type="gift">
+            代送服務
+          </button>
+        </div>
+
+        <div id="products"></div>
+      </section>
+
+      <section class="card">
+        <h2>02｜填寫訂購資料</h2>
+
+        <form id="orderForm">
+          <div class="field">
+            <label for="fbName">Facebook 名稱 <span class="required">*</span></label>
+            <input id="fbName" type="text" required maxlength="80"
+                   placeholder="請輸入 Facebook 名稱">
+            <div class="hint">曾在此瀏覽器儲存資料的客人，可輸入相同名稱快速填入。</div>
+          </div>
+
+          <div class="field">
+            <label for="gameNickname">遊戲暱稱 <span class="required">*</span></label>
+            <input id="gameNickname" type="text" required maxlength="80"
+                   placeholder="請輸入第五人格遊戲內暱稱">
+          </div>
+
+          <div class="field">
+            <label for="gameId">遊戲 ID <span class="required">*</span></label>
+            <input id="gameId" type="text" required maxlength="80"
+                   placeholder="請輸入遊戲 ID">
+          </div>
+
+          <div class="field">
+            <label for="note">訂單備註（選填）</label>
+            <textarea id="note" rows="3" maxlength="500"
+                      placeholder="有其他需求可以填寫在這裡"></textarea>
+          </div>
+
+          <label class="remember">
+            <input type="checkbox" id="remember" checked>
+            <span>在這台裝置記住我的資料，方便下次購買</span>
+          </label>
+
+          <div id="rememberMessage" class="message" aria-live="polite"></div>
+        </form>
+      </section>
+    </div>
+
+    <aside class="card summary">
+      <h2>訂單摘要</h2>
+      <div id="summaryItems" class="muted">尚未選擇商品</div>
+
+      <div class="total">
+        <span>訂單總金額</span>
+        <strong id="totalPrice">NT$ 0</strong>
+      </div>
+
+      <button class="primary" type="submit" form="orderForm" id="submitButton">
+        確認訂單
+      </button>
+
+      <div class="notice">
+        目前為前台測試版本。確認訂單後會產生訂單文字，
+        尚未自動傳送至店家或試算表。
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="footer">
+  © 2026 Bai Xi 代儲代送 · All Rights Reserved.
+</footer>
+
+<div class="overlay" id="resultOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <h2 id="resultTitle">訂單內容</h2>
+    <p class="muted">請複製訂單內容並傳送給店家，才算完成聯繫。</p>
+    <textarea id="orderResult" readonly></textarea>
+    <button class="primary" id="copyOrder" type="button">複製訂單內容</button>
+    <button class="secondary" id="closeModal" type="button">關閉</button>
+  </div>
+</div>
+
+<script>
+  // ==================================================
+  // 商品設定：之後可以改為讀取 Google 試算表
+  // ==================================================
+
+
+const API_URL = "https://script.google.com/macros/s/AKfycbxgeXd0BF2BvfNAMGMDc8uOoxFxPr48CRuzKZngOFoonrVc_IFpa8_aei9ejd2UFwveTA/exec";
+
+let PRODUCTS = [];
+
+async function loadProducts() {
+  const container = document.getElementById("products");
+
+  container.textContent = "正在載入商品資料...";
+
+  try {
+    const data = await loadProductsJSONP();
+
+    if (!data.success || !Array.isArray(data.products)) {
+      throw new Error(data.message || "商品資料格式錯誤");
+    }
+
+    PRODUCTS = data.products.map(p => ({
+      id: p.id,
+      type: p.type,
+      name: p.name,
+      price: Number(p.price),
+      startDate: p.startDate || "",
+      endDate: p.endDate || ""
+    }));
+
+    renderProducts();
+    renderSummary();
+
+  } catch (error) {
+    console.error("商品載入失敗：", error);
+    container.textContent =
+      "商品載入失敗，請稍後重新整理網頁。";
+  }
+}
+
+function loadProductsJSONP() {
+  return new Promise((resolve, reject) => {
+    const callbackName = "baixiCallback" + Date.now();
+    const script = document.createElement("script");
+
+    let settled = false;
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("讀取商品逾時"));
+    }, 15000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      script.remove();
+      delete window[callbackName];
+    }
+
+    window[callbackName] = data => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(new Error("無法連接商品 API"));
+    };
+
+    script.src = API_URL
+      + "?action=products&callback="
+      + encodeURIComponent(callbackName)
+      + "&t=" + Date.now();
+
+    document.head.appendChild(script);
+  });
+}
+
+
+  let currentType = "topup";
+  const cart = {};
+
+  const $ = id => document.getElementById(id);
+  const money = n => "NT$ " + n.toLocaleString("zh-TW");
+
+  function taiwanToday() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Taipei",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+
+    const p = Object.fromEntries(
+      parts.map(item => [item.type, item.value])
+    );
+
+    return `${p.year}-${p.month}-${p.day}`;
+  }
+
+  function isAvailable(product) {
+    // 同一天到 00:00 就停止販售
+    return !product.endDate || taiwanToday() < product.endDate;
+  }
+
+  function isPreorder(product) {
+    return Boolean(product.startDate &&
+      taiwanToday() < product.startDate);
+  }
+
+  function createText(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    el.textContent = text;
+    return el;
+  }
+
+  function renderProducts() {
+    const container = $("products");
+    container.replaceChildren();
+
+    const list = PRODUCTS.filter(p =>
+      p.type === currentType && isAvailable(p)
+    );
+
+    if (!list.length) {
+      container.append(
+        createText("p", "muted", "目前沒有可購買的商品。")
+      );
+      return;
+    }
+
+    list.forEach(p => {
+      const row = createText("div", "product", "");
+      const info = createText("div", "product-info", "");
+      info.append(
+        createText("div", "product-name", p.name),
+        createText("div", "price", money(p.price))
+      );
+
+      if (isPreorder(p)) {
+        info.append(createText("span", "tag", "預購中"));
+      }
+
+      const quantity = createText("div", "quantity", "");
+
+      const minus = createText("button", "", "−");
+      minus.type = "button";
+      minus.setAttribute("aria-label", `減少${p.name}數量`);
+
+      const amount = createText("span", "", String(cart[p.id] || 0));
+
+      const plus = createText("button", "", "+");
+      plus.type = "button";
+      plus.setAttribute("aria-label", `增加${p.name}數量`);
+
+      minus.addEventListener("click", () => changeQuantity(p.id, -1));
+      plus.addEventListener("click", () => changeQuantity(p.id, 1));
+
+      quantity.append(minus, amount, plus);
+      row.append(info, quantity);
+      container.append(row);
+    });
+  }
+
+  function changeQuantity(id, delta) {
+    const p = PRODUCTS.find(item => item.id === id);
+    if (!p || !isAvailable(p)) return;
+
+    cart[id] = Math.max(0, Math.min(99, (cart[id] || 0) + delta));
+    renderProducts();
+    renderSummary();
+  }
+
+  function selectedProducts() {
+    return PRODUCTS.filter(p =>
+      p.type === currentType &&
+      isAvailable(p) &&
+      (cart[p.id] || 0) > 0
+    );
+  }
+
+  function renderSummary() {
+    const items = selectedProducts();
+    const target = $("summaryItems");
+    target.replaceChildren();
+
+    if (items.length === 0) {
+      target.append(
+        createText("p", "muted", "尚未選擇商品")
+      );
+    } else {
+      items.forEach(p => {
+        const line = createText("div", "summary-line", "");
+        line.append(
+          createText("span", "", `${p.name} × ${cart[p.id]}`),
+          createText("strong", "", money(p.price * cart[p.id]))
+        );
+        target.append(line);
+      });
+    }
+
+    const total = items.reduce(
+      (sum, p) => sum + p.price * cart[p.id], 0
+    );
+
+    $("totalPrice").textContent = money(total);
+    $("submitButton").disabled = items.length === 0;
+  }
+
+  function changeType(type) {
+    currentType = type;
+
+    // 每種服務的購物車獨立
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.type === type);
+    });
+
+    renderProducts();
+    renderSummary();
+  }
+
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      changeType(btn.dataset.type);
+    });
+  });
+
+  // ==================================================
+  // 回購資料：僅儲存在客人自己的瀏覽器
+  // ==================================================
+
+  const MEMORY_KEY = "baixi_customer_v1";
+
+  function normalizeName(name) {
+    return name.trim().toLocaleLowerCase();
+  }
+
+  function readMemory() {
+    try {
+      return JSON.parse(localStorage.getItem(MEMORY_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function fillSavedCustomer() {
+    const name = normalizeName($("fbName").value);
+    const saved = readMemory()[name];
+
+    if (saved) {
+      $("gameNickname").value = saved.gameNickname || "";
+      $("gameId").value = saved.gameId || "";
+      $("rememberMessage").textContent = "已帶入這台裝置上次儲存的資料。";
+    } else {
+      $("rememberMessage").textContent = "";
+    }
+  }
+
+  $("fbName").addEventListener("change", fillSavedCustomer);
+
+  function saveCustomer() {
+    if (!$("remember").checked) return;
+
+    try {
+      const data = readMemory();
+      const key = normalizeName($("fbName").value);
+
+      data[key] = {
+        gameNickname: $("gameNickname").value.trim(),
+        gameId: $("gameId").value.trim()
+      };
+
+      localStorage.setItem(MEMORY_KEY, JSON.stringify(data));
+    } catch {
+      // 瀏覽器可能禁止儲存，本次訂單仍可產生
+    }
+  }
+
+  // ==================================================
+  // 確認訂單（暫時不傳送到後端）
+  // ==================================================
+
+  $("orderForm").addEventListener("submit", event => {
+    event.preventDefault();
+
+    // 提交前再次檢查時間與品項
+    const requested = PRODUCTS.filter(p =>
+      p.type === currentType && (cart[p.id] || 0) > 0
+    );
+
+    const expired = requested.filter(p => !isAvailable(p));
+
+    if (expired.length) {
+      expired.forEach(p => { cart[p.id] = 0; });
+      renderProducts();
+      renderSummary();
+      alert("部分商品已到下架時間，請重新確認訂單。");
+      return;
+    }
+
+    const items = selectedProducts();
+
+    if (!items.length) {
+      alert("請先選擇商品。");
+      return;
+    }
+
+    const fbName = $("fbName").value.trim();
+    const nickname = $("gameNickname").value.trim();
+    const gameId = $("gameId").value.trim();
+    const note = $("note").value.trim();
+
+    if (!fbName || !nickname || !gameId) {
+      alert("請填寫完整的客戶資料。");
+      return;
+    }
+
+    saveCustomer();
+
+    const total = items.reduce(
+      (sum, p) => sum + p.price * cart[p.id], 0
+    );
+
+    const lines = [
+      "【Bai Xi 代儲代送｜訂單明細】",
+      "",
+      "服務類型：" + (currentType === "topup" ? "代儲" : "代送"),
+      "Facebook 名稱：" + fbName,
+      "遊戲暱稱：" + nickname,
+      "遊戲 ID：" + gameId,
+      "",
+      "商品清單：",
+      ...items.map(p =>
+        `${p.name} × ${cart[p.id]} = ${money(p.price * cart[p.id])}`
+      ),
+      "",
+      "訂單總金額：" + money(total),
+      "備註：" + (note || "無"),
+      "",
+      "※ 此為待傳送訂單，請聯繫店家確認。"
+    ];
+
+    $("orderResult").value = lines.join("\n");
+    $("resultOverlay").hidden = false;
+    $("copyOrder").textContent = "複製訂單內容";
+  });
+
+  $("copyOrder").addEventListener("click", async () => {
+    const text = $("orderResult").value;
+
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      $("orderResult").select();
+      document.execCommand("copy");
+    }
+
+    $("copyOrder").textContent = "已嘗試複製，請確認剪貼簿";
+  });
+
+  $("closeModal").addEventListener("click", () => {
+    $("resultOverlay").hidden = true;
+  });
+
+  // 跨越午夜時，重新檢查下架日期
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      renderProducts();
+      renderSummary();
+    }
+  });
+
+  setInterval(() => {
+    renderProducts();
+    renderSummary();
+  }, 30000);
+
+changeType("topup");
+loadProducts();
+</script>
+
+</body>
+</html>
