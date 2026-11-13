@@ -739,6 +739,48 @@
   font-weight: 650;
 }
 
+/* 限時代送按鈕內的熱門標誌 */
+
+/* 熱門貼紙 */
+.hot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+  margin-left: 6px;
+
+  background: #ed424c;
+  color: #ffffff;
+
+  border: 2px solid #ffffff;
+  border-radius: 7px;
+
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+
+  transform: rotate(12deg);
+  box-shadow: 0 2px 6px rgba(180, 40, 50, 0.25);
+
+  flex-shrink: 0;
+}
+
+/* 滑鼠移過時的小動畫 */
+.tab:hover .hot-badge {
+  transform: rotate(0deg) scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
 
 
 </style>
@@ -779,7 +821,7 @@
         <div class="tabs service-tabs">
           <button type="button" class="tab active" data-service="topup">代儲</button>
           <button type="button" class="tab" data-service="permanent">常駐代送</button>
-          <button type="button" class="tab" data-service="limited">限時代送</button>
+          <button type="button" class="tab" data-service="limited">限時代送 <span class="hot-badge"> 熱 </span></button>
         </div>
 
         <div id="products"></div>
