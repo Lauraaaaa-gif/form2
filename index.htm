@@ -741,30 +741,50 @@
 
 /* 限時代送按鈕內的熱門標誌 */
 
+/* 限時代送按鈕：做為貼紙定位基準 */
+.hot-tab {
+  position: relative;
+  overflow: visible;
+}
+
 /* 熱門貼紙 */
 .hot-badge {
-  display: inline-flex;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 2;
+
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 24px;
-  height: 24px;
-  margin-left: 6px;
+  width: 26px;
+  height: 26px;
 
   background: #ed424c;
-  color: #ffffff;
-
-  border: 2px solid #ffffff;
-  border-radius: 7px;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 8px;
 
   font-size: 12px;
   font-weight: 800;
   line-height: 1;
 
   transform: rotate(12deg);
-  box-shadow: 0 2px 6px rgba(180, 40, 50, 0.25);
+  box-shadow: 0 3px 8px rgba(180, 40, 50, 0.28);
 
-  flex-shrink: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .hot-badge {
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    border-radius: 7px;
+  }
 }
 
 /* 滑鼠移過時的小動畫 */
@@ -780,6 +800,26 @@
   justify-content: center;
   gap: 2px;
 }
+
+
+/* 手機版熱門貼紙優化 */
+@media (max-width: 480px) {
+  .hot-tab {
+    white-space: nowrap;
+    position: relative;
+    overflow: visible;
+  }
+
+  .hot-tab .hot-badge {
+    top: -9px;
+    right: -7px;
+    width: 23px;
+    height: 23px;
+    font-size: 11px;
+    margin: 0;
+  }
+}
+
 
 
 
@@ -821,7 +861,12 @@
         <div class="tabs service-tabs">
           <button type="button" class="tab active" data-service="topup">代儲</button>
           <button type="button" class="tab" data-service="permanent">常駐代送</button>
-          <button type="button" class="tab" data-service="limited">限時代送 <span class="hot-badge"> 熱 </span></button>
+     
+<button type="button" class="tab hot-tab" data-service="limited">
+  限時代送
+  <span class="hot-badge">熱</span>
+</button>
+
         </div>
 
         <div id="products"></div>
