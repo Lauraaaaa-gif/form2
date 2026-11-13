@@ -1776,28 +1776,21 @@ function showOrderSuccess(result) {
 
   // 顧客複製的訂單文字
 
-  const text = [
 
-    "【Bai Xi 代儲代送】",
+const text = [
+  "【BAIXI 代儲代送表單】",
+  "",
+  "• 建立時間：" + createdAt,
+  "• FB名稱：" + pendingOrder.data.fbName,
+  "• 遊戲暱稱：" + pendingOrder.data.gameNickname,
+  "• 遊戲ID：" + pendingOrder.data.gameId,
+  "• 訂單品項：",
+  orderItems,
+  "• 訂單金額：NT$ " +
+    Number(result.total).toLocaleString("zh-TW"),
+  "    ┈┈┈┈┈┈┈┈┈┈┈"
+].join("\n");
 
-    "",
-
-    "訂單送出成功~",
-    "FB名稱：" + pendingOrder.data.fbName,
-
-    "建立時間：" + createdAt,
-
-    "訂單品項：",
-
-    orderItems,
-
-    "訂單金額：NT$ " +
-
-      Number(result.total).toLocaleString("zh-TW"),
-
-    "",
-
-  ].join("\n");
 
   $("orderResult").value = text;
 
