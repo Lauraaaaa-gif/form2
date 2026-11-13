@@ -646,6 +646,28 @@
   .service-tabs .tab { font-size: 12px; padding: 11px 3px; }
 }
 
+
+/* 限時代送商品縮圖 */
+
+.product-image {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f5f7fa;
+}
+
+@media (max-width: 480px) {
+  .product-image {
+    width: 54px;
+    height: 54px;
+  }
+}
+
+
 </style>
 
 </head>
@@ -845,29 +867,21 @@ async function loadProducts() {
 
     }
 
+
 PRODUCTS = data.products.map(p => ({
-
   id: p.id,
-
   type: p.type,
-
   category: p.category || (
-
     p.type === "gift" ? "limited" : "topup"
-
   ),
-
   name: p.name,
-
   price: Number(p.price),
-
   startDate: p.startDate || "",
-
   endDate: p.endDate || "",
-
-  status: p.status
-
+  status: p.status,
+  imageUrl: p.imageUrl || ""
 }));
+
 
     renderProducts();
 
@@ -1038,6 +1052,32 @@ const list = PRODUCTS.filter(p => {
     }
 
     list.forEach(p => {
+
+
+// 限時代送：顯示商品圖片
+if (p.category === "limited" && p.imageUrl) {
+  try {
+    const imageUrl = new URL(p.imageUrl);
+
+    if (imageUrl.protocol === "https:") {
+      const image = document.createElement("img");
+
+      image.src = imageUrl.href;
+      image.alt = p.name;
+      image.className = "product-image";
+      image.loading = "lazy";
+
+      image.onerror = () => {
+        image.remove();
+      };
+
+      row.appendChild(image);
+    }
+  } catch (error) {
+    console.warn("商品圖片網址無效：", p.name);
+  }
+}
+
 
       const row = createText("div", "product", "");
 
