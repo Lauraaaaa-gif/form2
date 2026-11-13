@@ -468,9 +468,10 @@
       </button>
 
       <div class="notice">
-        目前為前台測試版本。確認訂單後會產生訂單文字，
-        尚未自動傳送至店家或試算表。
-      </div>
+  請確認商品及遊戲資訊正確。
+  訂單送出成功後將產生訂單編號，
+  店家會依照訂單順序確認與處理。
+</div>
     </aside>
   </div>
 </main>
@@ -482,7 +483,7 @@
 <div class="overlay" id="resultOverlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
     <h2 id="resultTitle">訂單內容</h2>
-    <p class="muted">請複製訂單內容並傳送給店家，才算完成聯繫。</p>
+    <p class="muted">訂單已送出，請保留訂單編號。</p>
     <textarea id="orderResult" readonly></textarea>
     <button class="primary" id="copyOrder" type="button">複製訂單內容</button>
     <button class="secondary" id="closeModal" type="button">關閉</button>
@@ -825,73 +826,262 @@ function renderSummary() {
   }
 
   // ==================================================
-  // 確認訂單（暫時不傳送到後端）
-  // ==================================================
+  
+  // ==========================================
+  // Bai Xi 訂單傳送系統
+  // ==========================================
 
-  $("orderForm").addEventListener("submit", event => {
-    event.preventDefault();
+  let pendingOrder = null;
 
-    // 提交前再次檢查時間與品項
-    const requested = PRODUCTS.filter(p =>
-      p.type === currentType && (cart[p.id] || 0) > 0
-    );
+  // 查詢訂單是否成功寫入 Google 試算表
+  function checkOrderReceipt(requestId) {
+    return new Promise((resolve, reject) => {
+      const callbackName =
+        "baixiReceipt_" +
+        Date.now() + "_" +
+        Math.floor(Math.random() * 100000);
 
-    const expired = requested.filter(p => !isAvailable(p));
+      const script = document.createElement("script");
+      let finished = false;
 
-    if (expired.length) {
-      expired.forEach(p => { cart[p.id] = 0; });
-      renderProducts();
-      renderSummary();
-      alert("部分商品已到下架時間，請重新確認訂單。");
-      return;
+      const timer = setTimeout(() => {
+        finish(new Error("查詢逾時"));
+      }, 10000);
+
+      function finish(error, data) {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        script.remove();
+        delete window[callbackName];
+
+        if (error) reject(error);
+        else resolve(data);
+      }
+
+      window[callbackName] = data => finish(null, data);
+
+      script.onerror = () => {
+        finish(new Error("訂單查詢失敗"));
+      };
+
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "receipt");
+      url.searchParams.set("requestId", requestId);
+      url.searchParams.set("callback", callbackName);
+      url.searchParams.set("t", Date.now());
+
+      script.src = url.toString();
+      document.head.appendChild(script);
+    });
+  }
+
+  // 傳送訂單至 Google Apps Script
+  async function submitOrderToSheet(order) {
+    const body = new URLSearchParams();
+    body.set("order", JSON.stringify(order));
+
+    try {
+      await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: body
+      });
+    } catch (error) {
+      console.warn("無法確認傳送結果：", error);
     }
 
+    // 因為 no-cors 無法讀取 POST 回應，
+    // 必須另行查詢訂單是否真的儲存。
+    for (let i = 0; i < 12; i++) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      try {
+        const receipt = await checkOrderReceipt(order.requestId);
+
+        if (receipt.success && receipt.confirmed) {
+          return receipt;
+        }
+
+        if (receipt.success === false) {
+          throw new Error(receipt.message || "訂單查詢失敗");
+        }
+      } catch (error) {
+        console.warn("訂單確認查詢：", error);
+      }
+    }
+
+    throw new Error(
+      "無法確認訂單是否成功。請先聯繫店家確認，避免重複下單。"
+    );
+  }
+
+  // 取得目前的訂單資料
+  function buildCurrentOrder() {
     const items = selectedProducts();
 
     if (!items.length) {
-      alert("請先選擇商品。");
-      return;
+      throw new Error("請先選擇商品");
     }
 
     const fbName = $("fbName").value.trim();
-    const nickname = $("gameNickname").value.trim();
+    const gameNickname = $("gameNickname").value.trim();
     const gameId = $("gameId").value.trim();
     const note = $("note").value.trim();
 
-    if (!fbName || !nickname || !gameId) {
-      alert("請填寫完整的客戶資料。");
-      return;
+    if (!fbName || !gameNickname || !gameId) {
+      throw new Error("請填寫完整的訂購資料");
     }
 
-    saveCustomer();
+    return {
+      type: currentType,
+      fbName,
+      gameNickname,
+      gameId,
+      note,
+      items: items.map(p => ({
+        id: p.id,
+        quantity: cart[p.id]
+      }))
+    };
+  }
 
-    const total = items.reduce(
-      (sum, p) => sum + p.price * cart[p.id], 0
-    );
+  // 按下確認訂單
+  $("orderForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-    const lines = [
-      "【Bai Xi 代儲代送｜訂單明細】",
-      "",
-      "服務類型：" + (currentType === "topup" ? "代儲" : "代送"),
-      "Facebook 名稱：" + fbName,
-      "遊戲暱稱：" + nickname,
-      "遊戲 ID：" + gameId,
-      "",
-      "商品清單：",
-      ...items.map(p =>
-        `${p.name} × ${cart[p.id]} = ${money(p.price * cart[p.id])}`
-      ),
-      "",
-      "訂單總金額：" + money(total),
-      "備註：" + (note || "無"),
-      "",
-      "※ 此為待傳送訂單，請聯繫店家確認。"
-    ];
+    const button = $("submitButton");
 
-    $("orderResult").value = lines.join("\n");
-    $("resultOverlay").hidden = false;
-    $("copyOrder").textContent = "複製訂單內容";
+    if (button.dataset.sending === "true") return;
+
+    try {
+      // 每次送單前確認商品是否過期
+      const expired = PRODUCTS.filter(p =>
+        p.type === currentType &&
+        (cart[p.id] || 0) > 0 &&
+        !isAvailable(p)
+      );
+
+      if (expired.length) {
+        expired.forEach(p => cart[p.id] = 0);
+        renderProducts();
+        renderSummary();
+        throw new Error("部分商品已下架，請重新確認訂單");
+      }
+
+      // 若前一筆送單結果未確認，先查詢，避免重複建立。
+      if (pendingOrder) {
+        const previous = await checkOrderReceipt(
+          pendingOrder.requestId
+        );
+
+        if (previous.success && previous.confirmed) {
+          showOrderSuccess(previous);
+          return;
+        }
+
+        const current = buildCurrentOrder();
+
+        const sameOrder = JSON.stringify(current) ===
+          JSON.stringify(pendingOrder.data);
+
+        if (!sameOrder) {
+          throw new Error(
+            "上一筆訂單尚未確認，請先聯繫店家確認，再修改訂單。"
+          );
+        }
+      } else {
+        const data = buildCurrentOrder();
+
+        pendingOrder = {
+          requestId: crypto.randomUUID(),
+          data
+        };
+      }
+
+      button.dataset.sending = "true";
+      button.disabled = true;
+      button.textContent = "訂單傳送中...";
+
+      const result = await submitOrderToSheet({
+        requestId: pendingOrder.requestId,
+        ...pendingOrder.data
+      });
+
+      showOrderSuccess(result);
+
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "訂單處理失敗");
+
+    } finally {
+      button.dataset.sending = "false";
+      button.textContent = "確認訂單";
+      renderSummary();
+    }
   });
+
+  // 訂單成功後顯示結果
+ 
+function showOrderSuccess(result) {
+  saveCustomer();
+
+  // 台灣時間
+  const createdAt = new Intl.DateTimeFormat("zh-TW", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(new Date());
+
+  // 取得訂單品項
+  const orderItems = pendingOrder.data.items.map(item => {
+    const product = PRODUCTS.find(p => p.id === item.id);
+
+    return product
+      ? `${product.name} × ${item.quantity}`
+      : `商品 × ${item.quantity}`;
+  }).join("\n");
+
+  // 顧客複製的訂單文字
+  const text = [
+    "【Bai Xi 代儲代送】",
+    "",
+    "訂單送出成功~",
+    "FB名稱：" + pendingOrder.data.fbName,
+    "建立時間：" + createdAt,
+    "訂單品項：",
+    orderItems,
+    "訂單金額：NT$ " +
+      Number(result.total).toLocaleString("zh-TW"),
+    "",
+    "請複製文案傳送至聊天室"
+  ].join("\n");
+
+  $("orderResult").value = text;
+
+  document.querySelector(
+    "#resultOverlay .modal p"
+  ).textContent =
+    "訂單已成功送出，請複製以下內容並傳送至聊天室。";
+
+  $("resultOverlay").hidden = false;
+  $("copyOrder").textContent = "複製訂單內容";
+
+  // 成功後清空購物車
+  pendingOrder.data.items.forEach(item => {
+    cart[item.id] = 0;
+  });
+
+  pendingOrder = null;
+
+  renderProducts();
+  renderSummary();
+}
+
 
   $("copyOrder").addEventListener("click", async () => {
     const text = $("orderResult").value;
