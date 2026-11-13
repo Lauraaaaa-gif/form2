@@ -668,6 +668,49 @@
 }
 
 
+/* 商品排列：圖片與文字靠左 */
+.product {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+/* 商品名稱與價格 */
+.product-info {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+/* 數量按鈕固定在右側 */
+.quantity {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* 商品圖片 */
+.product-image {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+@media (max-width: 480px) {
+  .product {
+    gap: 10px;
+  }
+
+  .product-image {
+    width: 54px;
+    height: 54px;
+  }
+}
+
+
+
 </style>
 
 </head>
@@ -1029,6 +1072,7 @@ const cart = {};
 
   function renderProducts() {
 
+
     const container = $("products");
 
     container.replaceChildren();
@@ -1054,34 +1098,31 @@ const list = PRODUCTS.filter(p => {
     list.forEach(p => {
 
 
-// 限時代送：顯示商品圖片
-if (p.category === "limited" && p.imageUrl) {
-  try {
-    const imageUrl = new URL(p.imageUrl);
 
-    if (imageUrl.protocol === "https:") {
-      const image = document.createElement("img");
-
-      image.src = imageUrl.href;
-      image.alt = p.name;
-      image.className = "product-image";
-      image.loading = "lazy";
-
-      image.onerror = () => {
-        image.remove();
-      };
-
-      row.appendChild(image);
-    }
-  } catch (error) {
-    console.warn("商品圖片網址無效：", p.name);
-  }
-}
 
 
       const row = createText("div", "product", "");
 
       const info = createText("div", "product-info", "");
+
+
+
+if (p.category === "limited" && p.imageUrl) {
+  const image = document.createElement("img");
+
+  image.src = String(p.imageUrl).trim();
+  image.alt = p.name;
+  image.className = "product-image";
+  image.loading = "lazy";
+
+  image.onerror = () => {
+    console.error("圖片載入失敗：", image.src);
+    image.remove();
+  };
+
+  row.appendChild(image);
+}
+
 
       info.append(
 
