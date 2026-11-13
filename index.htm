@@ -381,6 +381,47 @@
       .quantity button { width: 29px; height: 29px; }
       .product-name { font-size: 13px; }
     }
+
+
+/* 代送商品次分類 */
+
+.gift-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.gift-tabs[hidden] {
+  display: none;
+}
+
+.gift-tab {
+  padding: 12px 8px;
+  border: 1px solid #d6e0eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #53647a;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background .2s, color .2s;
+}
+
+.gift-tab:hover {
+  background: #f0f4f8;
+}
+
+.gift-tab.active {
+  background: #e7eef7;
+  color: #10243d;
+  border-color: #9bb3cf;
+}
+
+.gift-tab:focus-visible {
+  outline: 2px solid #245783;
+  outline-offset: 2px;
+}
+
   </style>
 </head>
 <body>
@@ -403,16 +444,62 @@
       <section class="card">
         <h2>01｜選擇服務與商品</h2>
 
-        <div class="tabs">
-          <button type="button" class="tab active" data-type="topup">
-            代儲服務
-          </button>
-          <button type="button" class="tab" data-type="gift">
-            代送服務
-          </button>
-        </div>
+    
+<!-- 代送服務次分類 -->
+<div class="gift-tabs" id="giftTabs" hidden>
+  <button
+    type="button"
+    class="gift-tab"
+    data-category="permanent">
+    常駐商城代送
+  </button>
 
-        <div id="products"></div>
+  <button
+    type="button"
+    class="gift-tab active"
+    data-category="limited">
+    限時返場代送
+  </button>
+</div>
+
+
+<!-- 主要服務分類 -->
+<div class="tabs">
+  <button
+    type="button"
+    class="tab active"
+    data-type="topup">
+    代儲服務
+  </button>
+
+  <button
+    type="button"
+    class="tab"
+    data-type="gift">
+    代送服務
+  </button>
+</div>
+
+<!-- 代送次分類 -->
+<div class="gift-tabs" id="giftTabs" hidden>
+  <button
+    type="button"
+    class="gift-tab"
+    data-category="permanent">
+    常駐商城代送
+  </button>
+
+  <button
+    type="button"
+    class="gift-tab active"
+    data-category="limited">
+    限時返場代送
+  </button>
+</div>
+
+<!-- 商品列表 -->
+<div id="products"></div>
+
       </section>
 
       <section class="card">
@@ -512,14 +599,20 @@ async function loadProducts() {
       throw new Error(data.message || "商品資料格式錯誤");
     }
 
-    PRODUCTS = data.products.map(p => ({
-      id: p.id,
-      type: p.type,
-      name: p.name,
-      price: Number(p.price),
-      startDate: p.startDate || "",
-      endDate: p.endDate || ""
-    }));
+
+PRODUCTS = data.products.map(p => ({
+  id: p.id,
+  type: p.type,
+  category: p.category || (
+    p.type === "gift" ? "limited" : "topup"
+  ),
+  name: p.name,
+  price: Number(p.price),
+  startDate: p.startDate || "",
+  endDate: p.endDate || "",
+  status: p.status
+}));
+
 
     renderProducts();
     renderSummary();
@@ -574,6 +667,26 @@ function loadProductsJSONP() {
 
 
   let currentType = "topup";
+
+
+let currentGiftCategory = "limited";
+
+document.querySelectorAll(".gift-tab").forEach(button => {
+  button.addEventListener("click", () => {
+    currentGiftCategory = button.dataset.category;
+
+    document.querySelectorAll(".gift-tab").forEach(tab => {
+      tab.classList.toggle(
+        "active",
+        tab.dataset.category === currentGiftCategory
+      );
+    });
+
+    renderProducts();
+    renderSummary();
+  });
+});
+
   const cart = {};
 
   const $ = id => document.getElementById(id);
@@ -615,9 +728,18 @@ function loadProductsJSONP() {
     const container = $("products");
     container.replaceChildren();
 
-    const list = PRODUCTS.filter(p =>
-      p.type === currentType && isAvailable(p)
-    );
+
+const list = PRODUCTS.filter(p => {
+  if (!isAvailable(p)) return false;
+
+  if (currentType === "topup") {
+    return p.type === "topup";
+  }
+
+  return p.type === "gift" &&
+    p.category === currentGiftCategory;
+});
+
 
     if (!list.length) {
       container.append(
@@ -756,17 +878,25 @@ function renderSummary() {
 }
 
 
-  function changeType(type) {
-    currentType = type;
 
-    // 每種服務的購物車獨立
-    document.querySelectorAll(".tab").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.type === type);
-    });
 
-    renderProducts();
-    renderSummary();
-  }
+function changeType(type) {
+  currentType = type;
+
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.classList.toggle(
+      "active",
+      btn.dataset.type === type
+    );
+  });
+
+  $("giftTabs").hidden = type !== "gift";
+
+  renderProducts();
+  renderSummary();
+}
+
+
 
   document.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => {
