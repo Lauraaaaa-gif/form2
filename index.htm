@@ -710,6 +710,36 @@
 }
 
 
+/* 限時商品下架倒數 */
+
+.countdown-tag {
+  display: table;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff0e5;
+  color: #a95016;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+
+/* 上架倒數標籤 */
+
+.release-tag {
+  display: table;
+  width: fit-content;
+  margin-top: 5px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #e8f1ff;
+  color: #245783;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+
 
 </style>
 
@@ -1054,6 +1084,68 @@ const cart = {};
 
   }
 
+
+function getRemainingDays(product) {
+  // 只適用於限時代送
+  if (product.category !== "limited") return null;
+
+  // 沒有下架日期，或仍在預購中，就不顯示
+  if (!product.endDate || isPreorder(product)) {
+    return null;
+  }
+
+  // 使用台灣日期計算，避免不同時區造成誤差
+  const today = taiwanToday();
+
+  const toUTC = dateString => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return Date.UTC(year, month - 1, day);
+  };
+
+  const remaining = Math.round(
+    (toUTC(product.endDate) - toUTC(today)) / 86400000
+  );
+
+  // 只顯示距離下架 1～7 天的商品
+  if (remaining < 1 || remaining > 7) {
+    return null;
+  }
+
+  return remaining;
+}
+
+
+function getDaysUntilRelease(product) {
+  // 僅限限時代送商品
+  if (product.category !== "limited") return null;
+
+  // 沒有上架日期，或已經上架
+  if (!product.startDate || !isPreorder(product)) {
+    return null;
+  }
+
+  const today = taiwanToday();
+
+  const toUTC = dateString => {
+    const [year, month, day] =
+      dateString.split("-").map(Number);
+
+    return Date.UTC(year, month - 1, day);
+  };
+
+  const days = Math.round(
+    (toUTC(product.startDate) - toUTC(today)) / 86400000
+  );
+
+  // 只顯示 1～30 天內的上架倒數
+  if (days < 1 || days > 30) {
+    return null;
+  }
+
+  return days;
+}
+
+
   function createText(tag, className, text) {
 
     const el = document.createElement(tag);
@@ -1128,11 +1220,37 @@ if (p.category === "limited" && p.imageUrl) {
 
       );
 
-      if (isPreorder(p)) {
+    
 
-        info.append(createText("span", "tag", "預購"));
+if (isPreorder(p)) {
+  const daysUntilRelease = getDaysUntilRelease(p);
 
-      }
+  if (daysUntilRelease !== null) {
+    info.append(
+      createText(
+        "span",
+        "release-tag",
+        `於 ${daysUntilRelease} 天後上架`
+      )
+    );
+  }
+}
+
+
+
+
+const remainingDays = getRemainingDays(p);
+
+if (remainingDays !== null) {
+  const countdownTag = createText(
+    "span",
+    "countdown-tag",
+    `剩餘 ${remainingDays} 天`
+  );
+
+  info.append(countdownTag);
+}
+
 
       const quantity = createText("div", "quantity", "");
 
