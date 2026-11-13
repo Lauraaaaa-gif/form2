@@ -1050,7 +1050,6 @@ function showOrderSuccess(result) {
   const text = [
     "【Bai Xi 代儲代送】",
     "",
-    "訂單送出成功~",
     "FB名稱：" + pendingOrder.data.fbName,
     "建立時間：" + createdAt,
     "訂單品項：",
@@ -1058,7 +1057,6 @@ function showOrderSuccess(result) {
     "訂單金額：NT$ " +
       Number(result.total).toLocaleString("zh-TW"),
     "",
-    "請複製文案傳送至聊天室"
   ].join("\n");
 
   $("orderResult").value = text;
