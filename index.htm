@@ -864,21 +864,27 @@
   }
 }
 
-/* 手機版：縮小商品文字 */
+/* 手機版：商品文字等比例縮小至 90% */
 @media (max-width: 480px) {
-  #products .product-name {
-    font-size: 14px;
-    line-height: 1.5;
+  #products .product-info {
+    --text-scale: 0.9;
   }
 
+  #products .product-name,
   #products .price {
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: calc(16px * var(--text-scale));
   }
 
   #products .release-tag,
   #products .countdown-tag {
-    font-size: 10px;
+    font-size: calc(11px * var(--text-scale));
+  }
+}
+
+/* 保留原本小螢幕商品名稱的比例 */
+@media (max-width: 380px) {
+  #products .product-name {
+    font-size: calc(13px * var(--text-scale));
   }
 }
 
