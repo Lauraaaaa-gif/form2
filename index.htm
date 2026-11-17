@@ -820,7 +820,49 @@
   }
 }
 
+/* 商品獨立外框，保留目前的排列 */
+#products > .product {
+  padding: 16px;
+  margin-bottom: 12px;
 
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #ffffff;
+
+  box-shadow: 0 2px 8px rgba(19, 39, 61, 0.04);
+}
+
+/* 最後一項也保留完整外框 */
+#products > .product:last-child {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0;
+}
+
+/* 名稱可正常換行，價格保持同一行 */
+#products > .product .product-name {
+  overflow-wrap: anywhere;
+}
+
+#products > .product .price {
+  white-space: nowrap;
+}
+
+/* 手機縮小內距，留空間給圖片、文字及數量按鈕 */
+@media (max-width: 480px) {
+  #products > .product {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+
+  #products > .product .product-image {
+    width: 44px;
+    height: 44px;
+  }
+
+  #products > .product .quantity {
+    gap: 6px;
+  }
+}
 
 
 </style>
