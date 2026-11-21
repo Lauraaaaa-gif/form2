@@ -1217,24 +1217,6 @@
   color: #8495aa;
 }
 
-/* 訂單摘要漸層框 */
-.summary .summary-heading {
-  display: flex;
-  align-items: center;
-
-  padding: 14px 16px;
-  margin-bottom: 20px;
-
-  background: linear-gradient(
-    110deg,
-    #eaf1f9 0%,
-    #f5f8fc 60%,
-    #ffffff 100%
-  );
-
-  border: 1px solid #e7edf5;
-  border-radius: 12px;
-}
 
 /* 訂單摘要標題 */
 .summary .summary-heading-text h2 {
@@ -1279,97 +1261,7 @@
 }
 
 
-/* =====================================
-   BAI XI｜霧藍漸層訂單摘要
-   ===================================== */
 
-/* 整張訂單摘要卡片 */
-.card.summary {
-  background: linear-gradient(
-    145deg,
-    #eaf1f9 0%,
-    #f5f8fc 45%,
-    #ffffff 85%
-  );
-
-  border: 1px solid #dce6f0;
-  border-radius: 16px;
-
-  box-shadow: 0 5px 18px rgba(16, 36, 61, 0.05);
-}
-
-/* 移除原本標題的獨立框線 */
-.summary .summary-heading {
-  display: flex;
-  align-items: center;
-
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-
-  padding: 0;
-  margin-bottom: 24px;
-}
-
-/* 標題文字 */
-.summary .summary-heading-text h2 {
-  margin: 0;
-  color: #132e4d;
-  font-size: 19px;
-  font-weight: 800;
-  line-height: 1.4;
-}
-
-/* 英文副標題 */
-.summary .summary-heading-text span {
-  display: block;
-  margin-top: 4px;
-
-  color: #8295ac;
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 1.2px;
-}
-
-/* 訂單明細 */
-.summary #summaryItems {
-  margin-bottom: 18px;
-}
-
-/* 總金額區 */
-.summary .total {
-  border-top: 1px solid #dbe5ef;
-  border-bottom: none;
-  padding: 20px 0;
-}
-
-/* 下方提醒文字 */
-.summary .notice {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(220, 230, 240, 0.65);
-  border-radius: 10px;
-}
-
-/* 手機版 */
-@media (max-width: 480px) {
-  .card.summary {
-    border-radius: 14px;
-    padding: 20px;
-  }
-
-  .summary .summary-heading {
-    margin-bottom: 20px;
-  }
-
-  .summary .summary-heading-text h2 {
-    font-size: 18px;
-  }
-
-  .summary .summary-heading-text span {
-    font-size: 10px;
-  }
-}
 
 
 /* =====================================
@@ -1425,6 +1317,34 @@
   }
 
   /* 訂單摘要提醒框 */
+  .summary .notice {
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+}
+
+
+/* ===== 訂單摘要：虛線小提醒 ===== */
+
+.summary .notice {
+  background: transparent;
+  background-image: none;
+
+  border: 1px dashed #a9bfd7;
+  border-radius: 10px;
+
+  padding: 12px 14px;
+  margin-top: 16px;
+
+  color: #5c7189;
+  font-size: 12px;
+  line-height: 1.8;
+
+  box-shadow: none;
+}
+
+/* 手機版 */
+@media (max-width: 480px) {
   .summary .notice {
     padding: 11px 12px;
     font-size: 12px;
