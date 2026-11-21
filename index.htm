@@ -1402,6 +1402,157 @@
 }
 
 
+/* =====================================
+   訂單摘要：桌機正常 / 手機底部固定摘要列
+   ===================================== */
+
+/* 桌機版：補一些結構樣式 */
+.summary .total-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary .total-label {
+  color: #4b6078;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.summary .selected-count {
+  display: none;
+  color: #5d6f85;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.summary .notice-title {
+  color: #31577c;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+/* =========================
+   手機版：改成底部固定摘要列
+   ========================= */
+@media (max-width: 780px) {
+
+  /* 避免底部固定列擋住內容 */
+  .container {
+    padding-bottom: 110px;
+  }
+
+  .summary {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    top: auto;
+    z-index: 50;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+
+    margin: 0;
+    padding: 12px 14px;
+
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #dfe5ec;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(16, 36, 61, 0.14);
+
+    backdrop-filter: blur(8px);
+  }
+
+  /* 手機版先隱藏標題、商品明細、提醒 */
+  .summary .summary-heading,
+  .summary #summaryItems,
+  .summary .notice {
+    display: none;
+  }
+
+  /* 手機版只保留件數 + 金額 */
+  .summary .total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .summary .total-label {
+    display: none;
+  }
+
+  .summary .selected-count {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #24384f;
+    line-height: 1.2;
+  }
+
+  .summary .total strong {
+    font-size: 18px;
+    line-height: 1.2;
+    color: #173a60;
+  }
+
+  /* 手機版按鈕 */
+  .summary .primary {
+    width: auto;
+    min-width: 132px;
+    padding: 13px 18px;
+    margin: 0;
+
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+
+    background: #173a60;
+    box-shadow: 0 6px 16px rgba(23, 58, 96, 0.18);
+  }
+
+  .summary .primary:disabled {
+    background: #a8b1bc;
+    box-shadow: none;
+    opacity: 1;
+  }
+}
+
+/* 更小的手機可再微調 */
+@media (max-width: 480px) {
+  .summary {
+    left: 10px;
+    right: 10px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    padding: 11px 12px;
+    border-radius: 14px;
+  }
+
+  .summary .primary {
+    min-width: 120px;
+    font-size: 15px;
+    padding: 12px 16px;
+  }
+
+  .summary .total strong {
+    font-size: 17px;
+  }
+
+  .summary .selected-count {
+    font-size: 12px;
+  }
+}
+
 
 </style>
 
@@ -1547,34 +1698,34 @@
 
 <div class="summary-heading">
   <div class="summary-heading-text">
-    <h2>訂單摘要</h2>
 
+<aside class="card summary">
+  <div class="summary-heading">
+    <div class="summary-heading-text">
+      <h2>訂單摘要</h2>
+      <span>ORDER SUMMARY</span>
+    </div>
   </div>
-</div>
 
-      <div id="summaryItems" class="muted">尚未選擇商品</div>
+  <div id="summaryItems" class="muted">尚未選擇商品</div>
 
-      <div class="total">
+  <div class="total">
+    <div class="total-info">
+      <span class="total-label">訂單總金額</span>
+      <span id="selectedCountLabel" class="selected-count">已選 0 件</span>
+    </div>
+    <strong id="totalPrice">NT$ 0</strong>
+  </div>
 
-        <span>訂單總金額</span>
+  <button class="primary" type="submit" form="orderForm" id="submitButton">
+    確認訂單
+  </button>
 
-        <strong id="totalPrice">NT$ 0</strong>
-
-      </div>
-
-      <button class="primary" type="submit" form="orderForm" id="submitButton">
-
-        確認訂單
-
-      </button>
-
-      <div class="notice">
-
-  訂單送出成功後，請複製訂單資訊至聊天室，
-
-  與我確認完畢後才算下單成功。
-
-</div>
+  <div class="notice">
+    訂單送出成功後，請複製訂單資訊至聊天室，
+    與我確認完畢後才算下單成功。
+  </div>
+</aside>
 
     </aside>
 
@@ -2126,17 +2277,19 @@ function renderSummary() {
 
   }
 
-  const total = items.reduce(
+const total = items.reduce(
+  (sum, p) => sum + p.price * cart[p.id],
+  0
+);
 
-    (sum, p) => sum + p.price * cart[p.id],
+const selectedCount = items.reduce(
+  (sum, p) => sum + (cart[p.id] || 0),
+  0
+);
 
-    0
-
-  );
-
-  $("totalPrice").textContent = money(total);
-
-  $("submitButton").disabled = items.length === 0;
+$("totalPrice").textContent = money(total);
+$("selectedCountLabel").textContent = `已選 ${selectedCount} 件`;
+$("submitButton").disabled = items.length === 0;
 
 }
 
