@@ -1193,6 +1193,186 @@
 }
 
 
+/* ========================================
+   BAI XI｜章節標題與訂單摘要統一設計
+   ======================================== */
+
+/* 01、02 標題文字統一 */
+.card .section-heading .section-heading-text h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #132e4d;
+}
+
+/* 01、02 英文副標題統一 */
+.card .section-heading .section-heading-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  color: #8495aa;
+}
+
+/* 訂單摘要漸層框 */
+.summary .summary-heading {
+  display: flex;
+  align-items: center;
+
+  padding: 14px 16px;
+  margin-bottom: 20px;
+
+  background: linear-gradient(
+    110deg,
+    #eaf1f9 0%,
+    #f5f8fc 60%,
+    #ffffff 100%
+  );
+
+  border: 1px solid #e7edf5;
+  border-radius: 12px;
+}
+
+/* 訂單摘要標題 */
+.summary .summary-heading-text h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #132e4d;
+}
+
+/* 訂單摘要英文副標題 */
+.summary .summary-heading-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  color: #8495aa;
+}
+
+/* 手機版統一字體與間距 */
+@media (max-width: 480px) {
+
+  .card .section-heading .section-heading-text h2,
+  .summary .summary-heading-text h2 {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .card .section-heading .section-heading-text span,
+  .summary .summary-heading-text span {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+  }
+
+  .summary .summary-heading {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+  }
+}
+
+
+/* =====================================
+   BAI XI｜霧藍漸層訂單摘要
+   ===================================== */
+
+/* 整張訂單摘要卡片 */
+.card.summary {
+  background: linear-gradient(
+    145deg,
+    #eaf1f9 0%,
+    #f5f8fc 45%,
+    #ffffff 85%
+  );
+
+  border: 1px solid #dce6f0;
+  border-radius: 16px;
+
+  box-shadow: 0 5px 18px rgba(16, 36, 61, 0.05);
+}
+
+/* 移除原本標題的獨立框線 */
+.summary .summary-heading {
+  display: flex;
+  align-items: center;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+/* 標題文字 */
+.summary .summary-heading-text h2 {
+  margin: 0;
+  color: #132e4d;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+/* 英文副標題 */
+.summary .summary-heading-text span {
+  display: block;
+  margin-top: 4px;
+
+  color: #8295ac;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.2px;
+}
+
+/* 訂單明細 */
+.summary #summaryItems {
+  margin-bottom: 18px;
+}
+
+/* 總金額區 */
+.summary .total {
+  border-top: 1px solid #dbe5ef;
+  border-bottom: none;
+  padding: 20px 0;
+}
+
+/* 下方提醒文字 */
+.summary .notice {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(220, 230, 240, 0.65);
+  border-radius: 10px;
+}
+
+/* 手機版 */
+@media (max-width: 480px) {
+  .card.summary {
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .summary .summary-heading {
+    margin-bottom: 20px;
+  }
+
+  .summary .summary-heading-text h2 {
+    font-size: 18px;
+  }
+
+  .summary .summary-heading-text span {
+    font-size: 10px;
+  }
+}
+
+
+
 </style>
 
 </head>
@@ -1335,7 +1515,12 @@
 
     <aside class="card summary">
 
-      <h2>訂單摘要</h2>
+<div class="summary-heading">
+  <div class="summary-heading-text">
+    <h2>訂單摘要</h2>
+
+  </div>
+</div>
 
       <div id="summaryItems" class="muted">尚未選擇商品</div>
 
