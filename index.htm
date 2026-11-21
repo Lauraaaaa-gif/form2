@@ -2742,7 +2742,7 @@ $("mobileSubmitButton").textContent = "傳送中...";
 
       button.dataset.sending = "false";
 
-      button.textContent = "確認訂單";
+      button.textContent = "送出訂單";
 
       $("mobileSubmitButton").textContent = "確認訂單";
 
@@ -2891,6 +2891,20 @@ const text = [
 changeType("topup");
 
 loadProducts();
+
+// 手機底部按鈕：前往訂單明細
+$("mobileSubmitButton").addEventListener("click", () => {
+  const summary = $("orderSummary");
+
+  summary.focus({ preventScroll: true });
+
+  summary.scrollIntoView({
+    behavior: window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches ? "auto" : "smooth",
+    block: "start"
+  });
+});
 
 </script>
 
