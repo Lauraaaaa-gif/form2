@@ -1372,6 +1372,65 @@
 }
 
 
+/* =====================================
+   Bai Xi｜手機版卡片寬度優化
+   僅影響 480px 以下的螢幕
+   ===================================== */
+
+@media (max-width: 480px) {
+
+  /* 整體頁面：增加左右留白 */
+  .container {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  /* 三個主要卡片統一縮小內距 */
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  /* 01、02 章節標題 */
+  .section-heading {
+    padding: 10px 12px;
+    margin-bottom: 18px;
+  }
+
+  /* 表單輸入框 */
+  #orderForm input[type="text"],
+  #orderForm textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* 縮小欄位之間的距離 */
+  #orderForm .field {
+    margin-bottom: 14px;
+  }
+
+  /* 訂單摘要卡片 */
+  .card.summary {
+    padding: 16px;
+  }
+
+  /* 確認訂單按鈕 */
+  .summary .primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  /* 訂單摘要提醒框 */
+  .summary .notice {
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+}
+
 
 </style>
 
