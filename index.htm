@@ -958,6 +958,82 @@
   }
 }
 
+
+/* ===== Bai Xi 柔和膠囊式選單 ===== */
+
+.service-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 5px;
+  margin-bottom: 20px;
+  background: #f0f3f7;
+  border-radius: 13px;
+}
+
+/* 未選中的頁籤 */
+.service-tabs .tab {
+  position: relative;
+  min-width: 0;
+  padding: 12px 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #66758a;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background .2s ease, color .2s ease;
+}
+
+/* 滑鼠移入 */
+.service-tabs .tab:hover {
+  background: #e3eaf2;
+  color: #245783;
+}
+
+/* 選中的頁籤 */
+.service-tabs .tab.active,
+.service-tabs .tab.active:hover {
+  background: #ffffff;
+  color: #10243d;
+  border: 1px solid #e1e7ee;
+  box-shadow: 0 2px 6px rgba(16, 36, 61, 0.08);
+}
+
+/* 鍵盤操作時的焦點 */
+.service-tabs .tab:focus-visible {
+  outline: 2px solid #245783;
+  outline-offset: 2px;
+}
+
+/* 熱門貼紙 */
+.service-tabs .hot-tab .hot-badge {
+  top: -8px;
+  right: -5px;
+  z-index: 3;
+}
+
+/* 手機版 */
+@media (max-width: 480px) {
+  .service-tabs {
+    gap: 3px;
+    padding: 4px;
+    border-radius: 11px;
+  }
+
+  .service-tabs .tab {
+    padding: 12px 2px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .service-tabs .hot-tab .hot-badge {
+    top: -8px;
+    right: -4px;
+  }
+}
+
+
 </style>
 
 </head>
@@ -1022,7 +1098,7 @@
 
                    placeholder="請輸入 Facebook 名稱">
 
-            <div class="hint">曾在此瀏覽器儲存資料的客人，可輸入相同名稱快速填入。</div>
+            <div class="hint">此瀏覽器曾儲存資料的客人，將自動填入上次的購買資訊。</div>
 
           </div>
 
@@ -1686,81 +1762,58 @@ document.querySelectorAll(".service-tabs .tab").forEach(btn => {
 
   // ==================================================
 
-  const MEMORY_KEY = "baixi_customer_v1";
+  
+const MEMORY_KEY = "baixi_customer_v2";
 
-  function normalizeName(name) {
-
-    return name.trim().toLocaleLowerCase();
-
+// 讀取瀏覽器儲存的顧客資料
+function readMemory() {
+  try {
+    return JSON.parse(localStorage.getItem(MEMORY_KEY) || "null");
+  } catch {
+    return null;
   }
+}
 
-  function readMemory() {
+// 開啟網頁時，自動填入上次儲存的資料
+function fillSavedCustomer() {
+  const saved = readMemory();
 
-    try {
+  if (!saved || typeof saved !== "object") return;
 
-      return JSON.parse(localStorage.getItem(MEMORY_KEY) || "{}");
+  $("fbName").value = saved.fbName || "";
+  $("gameNickname").value = saved.gameNickname || "";
+  $("gameId").value = saved.gameId || "";
 
-    } catch {
+  $("rememberMessage").textContent =
+    "已自動填入上次儲存的資料。";
+}
 
-      return {};
-
+// 成功下單後儲存資料
+function saveCustomer() {
+  try {
+    if (!$("remember").checked) {
+      localStorage.removeItem(MEMORY_KEY);
+      return;
     }
 
+    const data = {
+      fbName: $("fbName").value.trim(),
+      gameNickname: $("gameNickname").value.trim(),
+      gameId: $("gameId").value.trim()
+    };
+
+    localStorage.setItem(
+      MEMORY_KEY,
+      JSON.stringify(data)
+    );
+  } catch (error) {
+    console.warn("無法儲存顧客資料", error);
   }
+}
 
-  function fillSavedCustomer() {
+// 頁面開啟時執行自動填入
+fillSavedCustomer();
 
-    const name = normalizeName($("fbName").value);
-
-    const saved = readMemory()[name];
-
-    if (saved) {
-
-      $("gameNickname").value = saved.gameNickname || "";
-
-      $("gameId").value = saved.gameId || "";
-
-      $("rememberMessage").textContent = "已帶入這台裝置上次儲存的資料。";
-
-    } else {
-
-      $("rememberMessage").textContent = "";
-
-    }
-
-  }
-
-  $("fbName").addEventListener("change", fillSavedCustomer);
-
-  function saveCustomer() {
-
-    if (!$("remember").checked) return;
-
-    try {
-
-      const data = readMemory();
-
-      const key = normalizeName($("fbName").value);
-
-      data[key] = {
-
-        gameNickname: $("gameNickname").value.trim(),
-
-        gameId: $("gameId").value.trim()
-
-      };
-
-      localStorage.setItem(MEMORY_KEY, JSON.stringify(data));
-
-    } catch {
-
-      // 瀏覽器可能禁止儲存，本次訂單仍可產生
-
-    }
-
-  }
-
-  // ==================================================
 
   // ==========================================
 
