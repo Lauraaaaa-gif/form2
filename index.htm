@@ -2286,13 +2286,28 @@ $("mobileSubmitButton").disabled =
 }
 
 function changeType(service) {
-  currentService = service;
-  currentType = service === "topup" ? "topup" : "gift";
+  const nextType = service === "topup" ? "topup" : "gift";
 
+  // 代儲 ↔ 代送：清空所有已選商品
+  if (nextType !== currentType) {
+    Object.keys(cart).forEach(id => {
+      delete cart[id];
+    });
+  }
+
+  // 更新目前的服務與訂單類型
+  currentService = service;
+  currentType = nextType;
+
+  // 更新分頁按鈕樣式
   document.querySelectorAll(".service-tabs .tab").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.service === service);
+    btn.classList.toggle(
+      "active",
+      btn.dataset.service === service
+    );
   });
 
+  // 重新顯示商品數量、訂單明細與總金額
   renderProducts();
   renderSummary();
 }
