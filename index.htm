@@ -1753,14 +1753,14 @@
     <strong id="mobileTotalPrice" class="mobile-total-price">NT$ 0</strong>
   </div>
 
-  <button
-    type="submit"
-    form="orderForm"
-    id="mobileSubmitButton"
-    class="mobile-checkout-button"
-    disabled>
-    確認訂單
-  </button>
+<button
+  type="button"
+  id="mobileSubmitButton"
+  class="mobile-checkout-button"
+  aria-controls="orderSummary"
+  disabled>
+  訂單摘要
+</button>
 </div>
 
 
@@ -2744,7 +2744,7 @@ $("mobileSubmitButton").textContent = "傳送中...";
 
       button.textContent = "送出訂單";
 
-      $("mobileSubmitButton").textContent = "確認訂單";
+      $("mobileSubmitButton").textContent = "訂單摘要";
 
       renderSummary();
 
